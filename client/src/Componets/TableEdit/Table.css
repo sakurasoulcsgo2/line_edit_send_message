@@ -1,0 +1,16 @@
+/* Edit Table */
+.edit-table {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ปรับเป็นแนวนอนเมื่ออยู่บนจอโทรศัพท์ (ขนาดหน้าจอน้อยกว่าหรือเท่ากับ 600px) */
+@media screen and (max-width: 720px) {
+    .edit-table {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* เพิ่ม CSS อื่น ๆ ตามที่คุณต้องการในส่วนนี้ */
+  }
