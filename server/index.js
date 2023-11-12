@@ -801,32 +801,45 @@ app.post('/webhook/postback', (req, res) => {
   res.sendStatus(200);
 });
 
-// เพิ่ม route ใหม่สำหรับรับ HTTP request จาก React app
 app.post('/send-notification', (req, res) => {
-    const {status,phone} = req.body
-    console.log(status,phone)
-    db.query ('SELECT * FROM line_detail WHERE phoneNumber =?',[phone],(err,result)=> {
-      console.log(result[0].userId);
-      const userId = result[0].userId;                 
-     // ระบุ User ID ของผู้ใช้ LINE ที่ต้องการส่งข้อความ
-  
-    const notificationMessage = {
-      type: 'text',
-      text: status
-    };
-  
-    client.pushMessage(userId, notificationMessage)
-      .then(() => {
-        console.log('Notification sent successfully');
-        res.sendStatus(200);
-      })
-      .catch(error => {
-        console.error('Error sending notification:', error);
-        res.status(500).send('Error sending notification');
+  const { status, phone , estimate_time} = req.body;
+  console.log(status, phone, estimate_time);
+
+  db.query('SELECT * FROM line_detail WHERE phoneNumber =?', [phone], (err, result) => {
+      if (err) {
+          console.error('Error querying database:', err);
+          res.status(500).send('Error querying database');
+          return;
+      }
+
+      const userId = result[0].userId;
+
+      db.query('SELECT * FROM order_repair WHERE estimate_time =?', [estimate_time], (err, estimateResult) => {
+          if (err) {
+              console.error('Error querying estimate time:', err);
+              res.status(500).send('Error querying estimate time');
+              return;
+          }
+
+          const notificationMessage = {
+              type: 'text',
+              text: `รายการซ่อมของคุณ
+-${status}- 
+เวลาซ่อมเสร็จสิ้นโดยประมาณ: ${estimate_time}`
+          };
+
+          client.pushMessage(userId, notificationMessage)
+              .then(() => {
+                  console.log('Notification sent successfully');
+                  res.sendStatus(200);
+              })
+              .catch(error => {
+                  console.error('Error sending notification:', error);
+                  res.status(500).send('Error sending notification');
+              });
       });
-      
-    })
   });
+});
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {

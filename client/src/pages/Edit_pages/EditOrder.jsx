@@ -45,9 +45,9 @@ function EditOrder() {
   }, []);
 
   const nav = useNavigate();
-  const sendNotification = async (status,phone) => {
+  const sendNotification = async (status,phone,estimate_time) => {
     try {
-      await axios.post('http://localhost:3001/send-notification',{status:status,phone:phone});
+      await axios.post('http://localhost:3001/send-notification',{status:status,phone:phone,estimate_time:estimate_time});
       
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -69,7 +69,8 @@ function EditOrder() {
         
         const formatjson = JSON.parse(response?.config?.data)
         
-        sendNotification(formatjson?.repair_status,phone)
+        sendNotification(formatjson?.repair_status,phone,estimate_time)
+
       })
       .catch((error) => {
         console.log(error);
